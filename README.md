@@ -35,6 +35,12 @@
 
 비밀값(서명 키, API 키 등)은 저장소에 커밋하지 않고 `local.properties`나 환경변수로 주입합니다.
 
+## 문서
+
+- [`CLAUDE.md`](CLAUDE.md) — 프로젝트 규칙
+- [`docs/adr/`](docs/adr) — 아키텍처 결정 기록
+- [`docs/engineering-checklist.md`](docs/engineering-checklist.md) — 단계별로 갖춰 나갈 규칙·도구 목록
+
 ## 라이선스
 
 Copyright (c) 2026 dwlee. All rights reserved.
