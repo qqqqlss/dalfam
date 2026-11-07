@@ -9,8 +9,10 @@
 - **언어**: Kotlin (공통 코드는 순수 Kotlin, `commonMain`에서 `java.*` 미사용)
 - **멀티플랫폼**: Kotlin Multiplatform + Compose Multiplatform (Android, iOS UI 공유)
 - **날짜**: kotlinx-datetime
-- **DI**: Koin
-- **로컬 DB**: Room (KMP)
+- **아키텍처**: 클린 아키텍처(계층별 모듈, UseCase), 단방향 데이터 흐름(UDF), 코루틴·Flow
+- **DI**: Koin (+ Compiler Plugin)
+- **로컬 DB**: Room 3 (KMP)
+- **화면 이동**: Navigation 3
 - **설정 저장**: DataStore
 - **네트워크**: Ktor Client (+ 필요 시 Ktorfit)
 - **직렬화**: kotlinx-serialization
@@ -22,7 +24,9 @@
 |---|---|
 | `androidApp/` | Android 앱 진입점 |
 | `iosApp/` | iOS 앱 진입점 (Xcode 프로젝트) |
-| `shared/` | 공통 코드 — Compose UI, 도메인 로직, 서버와 공유할 DTO |
+| `shared/` | Compose UI, ViewModel, DI 조립 (Android·iOS 공유) |
+| `domain/` | 도메인 모델, UseCase — 순수 Kotlin (예정) |
+| `data/` | Room·DataStore·네트워크, Repository 구현 (예정) |
 | `server/` | Spring Boot 서버 (예정) |
 
 라이브러리·Kotlin 버전은 [`gradle/libs.versions.toml`](gradle/libs.versions.toml) 한 곳에서 관리합니다.

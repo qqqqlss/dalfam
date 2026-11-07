@@ -15,7 +15,9 @@
 - [x] `.editorconfig` (들여쓰기·줄바꿈·인코딩)
 - [x] GitHub 저장소: `main` 브랜치 보호 Ruleset (Restrict deletions, Block force pushes)
 - [x] 브랜치 전략: Git Flow (ADR 0005), `develop` 브랜치 생성
-- [ ] GitHub 저장소: 기본 브랜치를 `develop`으로, Ruleset 대상에 `develop` 추가, Squash·Merge commit 허용, 머지 후 브랜치 자동 삭제 — **직접 설정**
+- [x] GitHub 저장소: 기본 브랜치 `develop`, Ruleset 대상 `main`·`develop`
+- [ ] GitHub 저장소: Squash·Merge commit 허용, 머지 후 브랜치 자동 삭제 — **직접 설정**
+- [x] 아키텍처·비동기·라이브러리 결정 (ADR 0006~0008)
 - [ ] GitHub 계정: Keep my email private, Block command line pushes that expose my email — **직접 설정**
 - [ ] GitHub 저장소: Secret scanning, Push protection 켜기 — **직접 설정**
 - [ ] 커밋 메시지 형식과 언어 정하기 (예: Conventional Commits, 한국어/영어)
@@ -24,9 +26,12 @@
 
 | 항목 | 내용 | 결과물 |
 |---|---|---|
-| [ ] 패키지·계층 구조 | `feature/`, `data/`, `domain/` 등 나누는 기준 | ADR + `CLAUDE.md` |
-| [ ] 상태 관리·화면 구조 | ViewModel 사용 방식, 내비게이션 라이브러리 | ADR |
-| [ ] 라이브러리 추가 | kotlinx-datetime, Koin, Room(KMP), DataStore, kotlinx-serialization | `libs.versions.toml` |
+| [x] 패키지·계층 구조 | 계층별 Gradle 모듈, 모듈 안은 기능별 패키지 | ADR 0006 + `CLAUDE.md` |
+| [x] 상태 관리·화면 구조 | UDF(UiState + Action), StateFlow, Navigation 3 | ADR 0007·0008 |
+| [ ] Convention Plugin | `build-logic/`에 KMP 라이브러리 모듈 공통 설정 | `build-logic/` |
+| [ ] `domain`·`data` 모듈 생성 | 의존 방향대로 `settings.gradle.kts`에 등록 | 모듈 |
+| [ ] 라이브러리 추가 | coroutines, kotlinx-datetime, Koin + Compiler Plugin, Room 3, DataStore, kotlinx-serialization, Navigation 3 (안정 버전 확인) | `libs.versions.toml` |
+| [ ] 테스트 라이브러리 | kotlinx-coroutines-test, Turbine | `libs.versions.toml` |
 | [ ] 백업 정책 | `allowBackup`, `dataExtractionRules`로 건강 데이터를 자동 백업에서 뺄지, 내보내기 기능을 둘지 | ADR (0002 후속) |
 | [ ] 템플릿 예제 코드 정리 | `Greeting`, `Platform` 등 샘플 제거 | 코드 |
 
@@ -57,6 +62,7 @@
 |---|---|---|
 | [ ] Apple Team ID 관리 | `Config.xcconfig`에 직접 쓰지 않고 커밋 안 되는 로컬 파일로 분리 | `.gitignore` + xcconfig |
 | [ ] iOS 빌드·테스트 | `:shared:iosSimulatorArm64Test` 통과 확인 | — |
+| [ ] Swift 연동 | Swift에서 Kotlin 코루틴을 직접 호출해야 하면 SKIE 또는 Swift export(정식 출시 후) 검토 | ADR |
 
 ## 6단계 — 서버를 붙일 때
 

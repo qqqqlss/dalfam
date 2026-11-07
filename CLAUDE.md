@@ -11,8 +11,13 @@
 |---|---|
 | `androidApp/` | Android 진입점(Activity, 매니페스트, 앱 리소스)만. 로직 금지 |
 | `iosApp/` | iOS 진입점(Xcode 프로젝트) |
-| `shared/` | Compose UI, 도메인 로직, 데이터 계층, 서버와 공유할 DTO |
+| `shared/` | Compose UI, ViewModel, Koin 조립, iOS 프레임워크 묶음 |
+| `domain/` | (예정) 도메인 모델, Repository 인터페이스, UseCase. 순수 Kotlin |
+| `data/` | (예정) Room·DataStore·Ktor, Repository 구현, 모델 변환 |
+| `build-logic/` | (예정) 모듈 공통 빌드 설정(Convention Plugin) |
 | `server/` | (예정) Kotlin + Spring Boot |
+
+의존 방향: `androidApp → shared → domain`, `shared → data → domain`. `domain`은 아무것도 의존하지 않는다.
 
 ## 반드시 지킬 것
 
@@ -21,6 +26,20 @@
 - 날짜·시간은 `kotlinx-datetime`만 쓴다(`java.time` 금지). 생리일은 시각이 아닌 날짜이므로 `LocalDate`를 기본으로 한다.
 - 플랫폼 기능이 필요하면 `expect`/`actual` 또는 인터페이스 + Koin 주입으로 분리한다.
 - 서버와 주고받을 DTO는 `shared`에 `@Serializable`로 둔다. DTO와 DB 엔티티·도메인 모델은 섞지 않는다.
+
+### 아키텍처 (ADR 0006)
+- `domain`은 `kotlinx-coroutines-core`, `kotlinx-datetime` 외의 라이브러리에 의존하지 않는다. Room·Compose·Koin·Ktor 금지.
+- Repository 인터페이스는 `domain`, 구현은 `data`에 `internal`로 둔다. `data`가 밖에 공개하는 것은 Koin 모듈뿐이다.
+- ViewModel은 UseCase만 주입받는다. Repository를 직접 쓰지 않는다. 단순 조회도 UseCase를 만든다.
+- UseCase는 공개 함수 `operator fun invoke` 하나만 가진다. 이름은 `동사 + 대상 + UseCase`.
+- Entity(`data`), DTO, 도메인 모델(`domain`), UiState(`shared`)는 서로 다른 클래스다. 변환 함수는 바깥 계층에 둔다.
+- 모듈 안의 패키지는 기능별로 나눈다(`cycle/`, `notification/`, `settings/`).
+
+### 비동기·UI 상태 (ADR 0007)
+- 한 번 받는 결과는 `suspend`, 계속 바뀌는 데이터는 `Flow`.
+- 스레드 전환은 `data` 계층이 `withContext`로 책임진다. Dispatcher는 직접 쓰지 않고 주입받는다.
+- `GlobalScope`, 운영 코드의 `runBlocking`, 코루틴 안의 `runCatching` 금지. `CancellationException`을 삼키지 않는다.
+- 화면 상태는 `XxxUiState` 하나, 사용자 행동은 `sealed interface XxxAction` + `onAction()`. ViewModel은 `StateFlow`를 내보내고 Compose는 `collectAsStateWithLifecycle()`로 받는다.
 
 ### 건강 데이터 (민감정보)
 - 생리 기록은 기기 로컬에만 저장한다. 사용자 동의와 ADR 없이 외부 전송 코드를 추가하지 않는다.
@@ -35,6 +54,7 @@
 ### 의존성
 - Kotlin·라이브러리·플러그인 버전은 `gradle/libs.versions.toml`에서만 관리한다. `build.gradle.kts`에 버전 문자열을 직접 쓰지 않는다.
 - 새 라이브러리는 KMP(commonMain) 지원 여부를 먼저 확인한다.
+- 정식(stable) 버전만 쓴다. 알파·베타는 ADR로 이유를 남긴 경우에만 쓴다. 라이브러리 선택은 ADR 0008을 따른다(Room 3, Koin + Compiler Plugin, Navigation 3).
 
 ## 명령
 
@@ -55,7 +75,5 @@
 - 아직 정하지 않은 규칙과 도입 예정 도구는 `docs/engineering-checklist.md`에서 관리한다. 정해지면 이 파일로 옮긴다.
 
 ## 아직 정하지 않음 (TODO)
-- 패키지·계층 구조 (예: `feature/`, `data/`, `domain/`)
-- 상태 관리·화면 구조 (ViewModel, 내비게이션)
 - 테스트 작성 기준
 - 커밋 메시지 형식과 언어
