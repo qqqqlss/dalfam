@@ -29,9 +29,9 @@
 | [x] 패키지·계층 구조 | 계층별 Gradle 모듈, 모듈 안은 기능 → 계층 패키지 | ADR 0006 + `CLAUDE.md` |
 | [x] 상태 관리·화면 구조 | UDF(UiState + Action), StateFlow, Navigation 3 | ADR 0007·0008 |
 | [ ] Convention Plugin | `build-logic/`에 KMP 라이브러리 모듈 공통 설정 | `build-logic/` |
-| [ ] `domain`·`data` 모듈 생성 | 의존 방향대로 `settings.gradle.kts`에 등록 | 모듈 |
-| [ ] 라이브러리 추가 | coroutines, kotlinx-datetime, Koin + Compiler Plugin, Room 3, DataStore, kotlinx-serialization, Navigation 3 (안정 버전 확인) | `libs.versions.toml` |
-| [ ] 테스트 라이브러리 | kotlinx-coroutines-test, Turbine | `libs.versions.toml` |
+| [x] `domain`·`data` 모듈 생성 | 의존 방향대로 `settings.gradle.kts`에 등록 | 모듈 |
+| [ ] 라이브러리 추가 | 완료: coroutines, kotlinx-datetime, Room 3. 남음: Koin + Compiler Plugin, DataStore, kotlinx-serialization, Navigation 3 (안정 버전 확인) | `libs.versions.toml` |
+| [x] 테스트 라이브러리 | kotlinx-coroutines-test, Turbine | `libs.versions.toml` |
 | [ ] 백업 정책 | `allowBackup`, `dataExtractionRules`로 건강 데이터를 자동 백업에서 뺄지, 내보내기 기능을 둘지 | ADR (0002 후속) |
 | [ ] 템플릿 예제 코드 정리 | `Greeting`, `Platform` 등 샘플 제거 | 코드 |
 
