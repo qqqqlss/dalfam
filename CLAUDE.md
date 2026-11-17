@@ -33,7 +33,7 @@
 - ViewModel은 UseCase만 주입받는다. Repository를 직접 쓰지 않는다. 단순 조회도 UseCase를 만든다.
 - UseCase는 공개 함수 `operator fun invoke` 하나만 가진다. 이름은 `동사 + 대상 + UseCase`.
 - Entity(`data`), DTO, 도메인 모델(`domain`), UiState(`shared`)는 서로 다른 클래스다. 변환 함수는 바깥 계층에 둔다.
-- 모듈 안의 패키지는 기능별로 나눈다(`cycle/`, `notification/`, `settings/`).
+- 모듈 안의 패키지는 기능으로 먼저 나누고(`cycle/`, `notification/`), 기능 안이 커지면 계층(`model/`, `usecase/`)으로 나눈다. 두 기능 이상이 쓰는 코드는 `common/`.
 
 ### 비동기·UI 상태 (ADR 0007)
 - 한 번 받는 결과는 `suspend`, 계속 바뀌는 데이터는 `Flow`.

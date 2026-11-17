@@ -26,7 +26,7 @@
 
 | 항목 | 내용 | 결과물 |
 |---|---|---|
-| [x] 패키지·계층 구조 | 계층별 Gradle 모듈, 모듈 안은 기능별 패키지 | ADR 0006 + `CLAUDE.md` |
+| [x] 패키지·계층 구조 | 계층별 Gradle 모듈, 모듈 안은 기능 → 계층 패키지 | ADR 0006 + `CLAUDE.md` |
 | [x] 상태 관리·화면 구조 | UDF(UiState + Action), StateFlow, Navigation 3 | ADR 0007·0008 |
 | [ ] Convention Plugin | `build-logic/`에 KMP 라이브러리 모듈 공통 설정 | `build-logic/` |
 | [ ] `domain`·`data` 모듈 생성 | 의존 방향대로 `settings.gradle.kts`에 등록 | 모듈 |
@@ -45,6 +45,7 @@
 | [ ] CI | GitHub Actions: Android 빌드 + `:shared:testAndroidHostTest` | `.github/workflows/` |
 | [ ] PR 필수·검사 통과 | `main`·`develop` Ruleset에 Require a pull request, Require status checks 추가 | Ruleset |
 | [ ] 비밀값 검사 | gitleaks (pre-commit 또는 CI) | 설정 파일 |
+| [ ] UI 기능 모듈 분리 | 화면이 많아지면 `shared`의 UI를 `feature/*` 모듈로 분리 (`domain`·`data`는 공용 유지) | ADR 0006 후속 |
 
 ## 4단계 — 배포를 준비할 때
 

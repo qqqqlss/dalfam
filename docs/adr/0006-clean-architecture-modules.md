@@ -32,7 +32,7 @@ androidApp ──▶ shared ──▶ domain
 - `domain`은 다른 모듈에 의존하지 않는다. 외부 라이브러리는 `kotlinx-coroutines-core`, `kotlinx-datetime`만 허용한다. 둘 다 순수 Kotlin 멀티플랫폼 라이브러리라 "domain은 프레임워크를 모른다"는 원칙을 깨지 않는다.
 - `domain`이 Repository **인터페이스**를 정의하고 `data`가 **구현**한다(의존성 역전). `domain`에서 Room을 import하면 `domain/build.gradle.kts`에 Room이 없으므로 컴파일 에러가 난다.
 - `data`의 구현 클래스는 `internal`로 숨기고, 밖으로는 Koin 모듈(`dataModule`)만 공개한다. `shared`가 `data`에 의존하는 이유는 DI 조립뿐이다.
-- 모듈 안의 패키지는 기능별로 나눈다(`cycle/`, `notification/`, `settings/`).
+- 모듈 안의 패키지는 기능으로 먼저 나누고, 기능 안이 커지면 계층으로 나눈다(아래 "4. 모듈 안 패키지").
 - 모듈마다 반복되는 KMP 타깃·Android 설정은 `build-logic/`의 Convention Plugin으로 한 곳에서 관리한다.
 
 ### 2. ViewModel은 항상 UseCase를 거친다
@@ -67,6 +67,27 @@ internal class CycleRepositoryImpl(private val dao: CycleDao) : CycleRepository 
 
 변환 함수(`toDomain()`, `toEntity()`)는 바깥 계층에 둔다. `domain`은 다른 모델의 존재를 모른다.
 
+### 4. 모듈 안 패키지: 기능 → 계층
+
+```
+domain/
+├── cycle/
+│   ├── model/          Period, CycleStats ...
+│   ├── usecase/        RecordPeriodStartUseCase ...
+│   └── PeriodRepository.kt
+└── common/             여러 기능이 같이 쓰는 것 (time/DateProvider)
+
+data/
+├── cycle/              PeriodDao, PeriodEntity, PeriodMapper, PeriodRepositoryImpl
+└── database/           DalfamDatabase 등 DB 공용 설정
+```
+
+- 최상위 패키지는 기능이다(`cycle/`, `notification/`, `settings/`). 모듈이 달라도 같은 기능은 같은 이름을 쓴다.
+- 기능 안의 파일이 적으면 하위 폴더 없이 둔다. 많아지면 계층(`model/`, `usecase/`, `dao/` 등)으로 나눈다. 지금은 `domain/cycle`만 나누고 `data/cycle`(파일 4개)은 그대로 둔다.
+- 두 기능 이상이 쓰는 코드는 `common/`에 둔다. 한 기능에서만 쓰면 그 기능 안에 둔다.
+- 패키지로는 기능 간 의존을 막을 수 없다(Kotlin에는 package-private이 없다). 이 구성은 탐색과 응집도를 위한 것이고, 의존 강제는 모듈의 몫이다.
+- 다음 단계: 화면이 많아지면 `shared`의 UI를 `feature/*` 모듈로 분리한다. `domain`·`data`는 기능 간에 공유되므로 그때도 나누지 않는다(Now in Android도 `core/domain`, `core/data`를 공용으로 둔다).
+
 ## 고려한 대안
 
 ### 계층 분리 방법
@@ -77,6 +98,13 @@ internal class CycleRepositoryImpl(private val dao: CycleDao) : CycleRepository 
 | 모듈 하나 + 기능별 패키지 | `cycle/domain`, `cycle/data` ... | 기능 단위 응집도는 좋지만 의존 방향을 강제하지 못하는 건 같다. 이 장점은 모듈 안 패키지 구성으로 가져왔다 |
 | 기능 × 계층 모듈 | `core/*`, `feature/*` 여러 모듈 (Now in Android 방식) | 여러 팀이 기능별로 동시에 작업하거나 빌드가 느릴 때 이득이다. 혼자 하는 초기에는 설정 비용이 이점보다 크다. 앱이 커지면 계층 모듈에서 이 구조로 나누기 어렵지 않다 |
 | (올드) `app` 모듈 하나에 Activity가 모든 일 | 화면 코드에 DB·네트워크 호출 | 테스트할 수 없고, 화면이 바뀌면 로직도 같이 바뀐다 |
+
+### 모듈 안 패키지 구성
+
+| 대안 | 내용 | 택하지 않은 이유 |
+|---|---|---|
+| 계층별 | `model/`, `repository/`, `usecase/` | 파일이 적을 때 가장 간단하고 튜토리얼에서 흔하다. 하지만 기능이 늘면 `usecase/` 한 폴더에 관계없는 파일이 쌓이고, 기능 하나를 고칠 때 여러 폴더를 오간다. 큰 앱에서는 기능별 또는 기능 → 계층이 일반적이라, 학습 목적으로 그쪽을 경험한다 |
+| 기능별(하위 폴더 없음) | `cycle/` 안에 모델·UseCase를 평평하게 | 기능 안 파일이 10개를 넘으면 모델과 UseCase가 섞여 찾기 어렵다. 파일이 적은 기능에는 이 형태를 그대로 쓴다 |
 
 ### UseCase 사용 방식
 
