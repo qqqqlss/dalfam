@@ -1,6 +1,6 @@
 package com.dwlee.dalfam.data.cycle
 
-import com.dwlee.dalfam.domain.model.Period
+import com.dwlee.dalfam.domain.cycle.model.Period
 
 internal fun PeriodEntity.toDomain(): Period = Period(
     id = id,

@@ -4,7 +4,7 @@ import androidx.room3.Room
 import app.cash.turbine.test
 import com.dwlee.dalfam.data.database.DalfamDatabase
 import com.dwlee.dalfam.data.database.buildDalfamDatabase
-import com.dwlee.dalfam.domain.model.Period
+import com.dwlee.dalfam.domain.cycle.model.Period
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate

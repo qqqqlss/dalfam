@@ -1,7 +1,7 @@
 package com.dwlee.dalfam.data.cycle
 
-import com.dwlee.dalfam.domain.model.Period
-import com.dwlee.dalfam.domain.repository.PeriodRepository
+import com.dwlee.dalfam.domain.cycle.model.Period
+import com.dwlee.dalfam.domain.cycle.PeriodRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
