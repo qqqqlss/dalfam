@@ -1,4 +1,4 @@
-package com.dwlee.dalfam.domain.time
+package com.dwlee.dalfam.domain.common.time
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone

@@ -1,4 +1,4 @@
-package com.dwlee.dalfam.domain.model
+package com.dwlee.dalfam.domain.cycle.model
 
 import kotlinx.datetime.LocalDate
 

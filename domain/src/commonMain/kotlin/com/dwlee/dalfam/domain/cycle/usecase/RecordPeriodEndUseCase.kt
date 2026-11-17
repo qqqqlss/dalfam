@@ -1,7 +1,7 @@
-package com.dwlee.dalfam.domain.usecase
+package com.dwlee.dalfam.domain.cycle.usecase
 
-import com.dwlee.dalfam.domain.repository.PeriodRepository
-import com.dwlee.dalfam.domain.time.DateProvider
+import com.dwlee.dalfam.domain.cycle.PeriodRepository
+import com.dwlee.dalfam.domain.common.time.DateProvider
 import kotlinx.datetime.LocalDate
 
 sealed interface RecordPeriodEndResult {

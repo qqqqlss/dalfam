@@ -1,4 +1,4 @@
-package com.dwlee.dalfam.domain.model
+package com.dwlee.dalfam.domain.cycle.model
 
 /**
  * 기록으로부터 계산한 주기 통계.

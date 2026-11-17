@@ -12,8 +12,8 @@
 | `androidApp/` | Android 진입점(Activity, 매니페스트, 앱 리소스)만. 로직 금지 |
 | `iosApp/` | iOS 진입점(Xcode 프로젝트) |
 | `shared/` | Compose UI, ViewModel, Koin 조립, iOS 프레임워크 묶음 |
-| `domain/` | (예정) 도메인 모델, Repository 인터페이스, UseCase. 순수 Kotlin |
-| `data/` | (예정) Room·DataStore·Ktor, Repository 구현, 모델 변환 |
+| `domain/` | 도메인 모델, Repository 인터페이스, UseCase. 순수 Kotlin |
+| `data/` | Room·DataStore·Ktor, Repository 구현, 모델 변환 |
 | `build-logic/` | (예정) 모듈 공통 빌드 설정(Convention Plugin) |
 | `server/` | (예정) Kotlin + Spring Boot |
 

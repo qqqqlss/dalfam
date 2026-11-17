@@ -1,6 +1,6 @@
-package com.dwlee.dalfam.domain.repository
+package com.dwlee.dalfam.domain.cycle
 
-import com.dwlee.dalfam.domain.model.Period
+import com.dwlee.dalfam.domain.cycle.model.Period
 import kotlinx.coroutines.flow.Flow
 
 /**

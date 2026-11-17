@@ -1,10 +1,10 @@
-package com.dwlee.dalfam.domain.usecase
+package com.dwlee.dalfam.domain.cycle.usecase
 
-import com.dwlee.dalfam.domain.date
-import com.dwlee.dalfam.domain.model.CycleAlert
-import com.dwlee.dalfam.domain.model.CyclePhase
-import com.dwlee.dalfam.domain.model.Fertility
-import com.dwlee.dalfam.domain.model.Period
+import com.dwlee.dalfam.domain.cycle.date
+import com.dwlee.dalfam.domain.cycle.model.CycleAlert
+import com.dwlee.dalfam.domain.cycle.model.CyclePhase
+import com.dwlee.dalfam.domain.cycle.model.Fertility
+import com.dwlee.dalfam.domain.cycle.model.Period
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

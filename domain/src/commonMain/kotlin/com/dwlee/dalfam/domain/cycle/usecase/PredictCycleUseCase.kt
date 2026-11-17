@@ -1,7 +1,7 @@
-package com.dwlee.dalfam.domain.usecase
+package com.dwlee.dalfam.domain.cycle.usecase
 
-import com.dwlee.dalfam.domain.model.CyclePrediction
-import com.dwlee.dalfam.domain.model.CycleStats
+import com.dwlee.dalfam.domain.cycle.model.CyclePrediction
+import com.dwlee.dalfam.domain.cycle.model.CycleStats
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus

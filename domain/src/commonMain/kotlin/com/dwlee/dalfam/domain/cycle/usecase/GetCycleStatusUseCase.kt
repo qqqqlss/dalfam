@@ -1,12 +1,12 @@
-package com.dwlee.dalfam.domain.usecase
+package com.dwlee.dalfam.domain.cycle.usecase
 
-import com.dwlee.dalfam.domain.model.CycleAlert
-import com.dwlee.dalfam.domain.model.CyclePhase
-import com.dwlee.dalfam.domain.model.CyclePrediction
-import com.dwlee.dalfam.domain.model.CycleStats
-import com.dwlee.dalfam.domain.model.CycleStatus
-import com.dwlee.dalfam.domain.model.Fertility
-import com.dwlee.dalfam.domain.model.Period
+import com.dwlee.dalfam.domain.cycle.model.CycleAlert
+import com.dwlee.dalfam.domain.cycle.model.CyclePhase
+import com.dwlee.dalfam.domain.cycle.model.CyclePrediction
+import com.dwlee.dalfam.domain.cycle.model.CycleStats
+import com.dwlee.dalfam.domain.cycle.model.CycleStatus
+import com.dwlee.dalfam.domain.cycle.model.Fertility
+import com.dwlee.dalfam.domain.cycle.model.Period
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlin.math.abs

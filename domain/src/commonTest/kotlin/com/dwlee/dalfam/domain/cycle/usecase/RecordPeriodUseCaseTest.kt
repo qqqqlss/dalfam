@@ -1,10 +1,10 @@
-package com.dwlee.dalfam.domain.usecase
+package com.dwlee.dalfam.domain.cycle.usecase
 
-import com.dwlee.dalfam.domain.FakePeriodRepository
-import com.dwlee.dalfam.domain.date
-import com.dwlee.dalfam.domain.model.CyclePhase
-import com.dwlee.dalfam.domain.model.Period
-import com.dwlee.dalfam.domain.time.DateProvider
+import com.dwlee.dalfam.domain.cycle.FakePeriodRepository
+import com.dwlee.dalfam.domain.cycle.date
+import com.dwlee.dalfam.domain.cycle.model.CyclePhase
+import com.dwlee.dalfam.domain.cycle.model.Period
+import com.dwlee.dalfam.domain.common.time.DateProvider
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
