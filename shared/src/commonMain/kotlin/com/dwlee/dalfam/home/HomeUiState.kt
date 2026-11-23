@@ -1,6 +1,6 @@
 package com.dwlee.dalfam.home
 
-import com.dwlee.dalfam.domain.model.CycleStatus
+import com.dwlee.dalfam.domain.cycle.model.CycleStatus
 
 /**
  * 홈 화면이 그리는 데 필요한 모든 것. 화면은 이 값 하나만 보고 그린다.

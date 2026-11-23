@@ -4,7 +4,7 @@ import androidx.room3.RoomDatabase
 import com.dwlee.dalfam.data.cycle.PeriodRepositoryImpl
 import com.dwlee.dalfam.data.database.DalfamDatabase
 import com.dwlee.dalfam.data.database.buildDalfamDatabase
-import com.dwlee.dalfam.domain.repository.PeriodRepository
+import com.dwlee.dalfam.domain.cycle.PeriodRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

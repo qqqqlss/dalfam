@@ -2,8 +2,8 @@ package com.dwlee.dalfam.data.di
 
 import androidx.room3.Room
 import com.dwlee.dalfam.data.database.DalfamDatabase
-import com.dwlee.dalfam.domain.model.Period
-import com.dwlee.dalfam.domain.repository.PeriodRepository
+import com.dwlee.dalfam.domain.cycle.model.Period
+import com.dwlee.dalfam.domain.cycle.PeriodRepository
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import org.koin.dsl.koinApplication

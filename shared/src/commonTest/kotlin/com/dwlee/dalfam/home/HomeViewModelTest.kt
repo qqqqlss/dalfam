@@ -3,11 +3,11 @@ package com.dwlee.dalfam.home
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.dwlee.dalfam.InMemoryPeriodRepository
-import com.dwlee.dalfam.domain.model.CyclePhase
-import com.dwlee.dalfam.domain.time.DateProvider
-import com.dwlee.dalfam.domain.usecase.ObserveCycleStatusUseCase
-import com.dwlee.dalfam.domain.usecase.RecordPeriodEndUseCase
-import com.dwlee.dalfam.domain.usecase.RecordPeriodStartUseCase
+import com.dwlee.dalfam.domain.cycle.model.CyclePhase
+import com.dwlee.dalfam.domain.common.time.DateProvider
+import com.dwlee.dalfam.domain.cycle.usecase.ObserveCycleStatusUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodEndUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodStartUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

@@ -1,7 +1,7 @@
 package com.dwlee.dalfam.di
 
 import com.dwlee.dalfam.InMemoryPeriodRepository
-import com.dwlee.dalfam.domain.repository.PeriodRepository
+import com.dwlee.dalfam.domain.cycle.PeriodRepository
 import com.dwlee.dalfam.home.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

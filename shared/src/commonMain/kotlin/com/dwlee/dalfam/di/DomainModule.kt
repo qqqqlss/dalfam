@@ -1,13 +1,13 @@
 package com.dwlee.dalfam.di
 
-import com.dwlee.dalfam.domain.time.DateProvider
-import com.dwlee.dalfam.domain.time.SystemDateProvider
-import com.dwlee.dalfam.domain.usecase.CalculateCycleStatsUseCase
-import com.dwlee.dalfam.domain.usecase.GetCycleStatusUseCase
-import com.dwlee.dalfam.domain.usecase.ObserveCycleStatusUseCase
-import com.dwlee.dalfam.domain.usecase.PredictCycleUseCase
-import com.dwlee.dalfam.domain.usecase.RecordPeriodEndUseCase
-import com.dwlee.dalfam.domain.usecase.RecordPeriodStartUseCase
+import com.dwlee.dalfam.domain.common.time.DateProvider
+import com.dwlee.dalfam.domain.common.time.SystemDateProvider
+import com.dwlee.dalfam.domain.cycle.usecase.CalculateCycleStatsUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.GetCycleStatusUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.ObserveCycleStatusUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.PredictCycleUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodEndUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodStartUseCase
 import org.koin.dsl.module
 
 /**

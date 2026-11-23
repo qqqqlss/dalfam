@@ -2,11 +2,11 @@ package com.dwlee.dalfam.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dwlee.dalfam.domain.usecase.ObserveCycleStatusUseCase
-import com.dwlee.dalfam.domain.usecase.RecordPeriodEndResult
-import com.dwlee.dalfam.domain.usecase.RecordPeriodEndUseCase
-import com.dwlee.dalfam.domain.usecase.RecordPeriodStartResult
-import com.dwlee.dalfam.domain.usecase.RecordPeriodStartUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.ObserveCycleStatusUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodEndResult
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodEndUseCase
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodStartResult
+import com.dwlee.dalfam.domain.cycle.usecase.RecordPeriodStartUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

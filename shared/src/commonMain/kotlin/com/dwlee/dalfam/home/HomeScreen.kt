@@ -25,8 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.dwlee.dalfam.domain.model.CyclePhase
-import com.dwlee.dalfam.domain.model.CycleStatus
+import com.dwlee.dalfam.domain.cycle.model.CyclePhase
+import com.dwlee.dalfam.domain.cycle.model.CycleStatus
 import dalfam.shared.generated.resources.Res
 import dalfam.shared.generated.resources.home_button_end
 import dalfam.shared.generated.resources.home_button_start
