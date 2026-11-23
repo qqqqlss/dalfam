@@ -25,7 +25,7 @@
    - [1-6. 라이브러리](#1-6-라이브러리-adr-0008)
    - [1-7. 협업과 운영](#1-7-협업과-운영-adr-0003-0004-0005)
 2. [개념 정리](#2-개념-정리)
-   - [아키텍처](#아키텍처) · [코루틴](#코루틴) · [UDF와 ViewModel](#udf와-viewmodel) · [Koin (DSL)](#koin-dsl)
+   - [아키텍처](#아키텍처) · [코루틴](#코루틴) · [UDF와 ViewModel](#udf와-viewmodel) · [Koin (DSL)](#koin-dsl) · [Koin Annotations](#koin-annotations-compiler-plugin)
    - [KMP](#kmp) · [Room 3](#room-3) · [테스트](#테스트) · [프로젝트 운영](#프로젝트-운영)
 3. [ADR과 실제 코드가 다른 점](#3-adr과-실제-코드가-다른-점)
 4. [질문 기록](#4-질문-기록)
@@ -96,7 +96,7 @@
 | 분야 | 올드 | 대안 | **선택** |
 |---|---|---|---|
 | 로컬 DB | `SQLiteOpenHelper` 직접 사용 (SQL·변환을 손으로, 컴파일 검사 없음) | Room 2.x, SQLDelight(SQL 먼저 쓰고 코드 생성), Realm(앞날 불투명) | **Room 3** — KMP 중심, KSP 전용, 모든 API가 코루틴 |
-| DI | 직접 생성·싱글턴 (테스트에서 가짜로 바꾸기 어려움) | Dagger 2 / Hilt(실무 표준, KMP 미지원), Metro(컴파일 타임, KMP 지원, 1순위 대안), kotlin-inject | **Koin** (+ Compiler Plugin 예정) |
+| DI | 직접 생성·싱글턴 (테스트에서 가짜로 바꾸기 어려움) | Dagger 2 / Hilt(실무 표준, KMP 미지원), Metro(컴파일 타임, KMP 지원, 1순위 대안), kotlin-inject | **Koin + Compiler Plugin** (어노테이션 방식) |
 | 화면 이동 | Fragment + Navigation XML | Navigation Compose 2.x(백스택을 라이브러리가 숨김), Voyager, Decompose | **Navigation 3** — 백스택을 내가 가진 리스트로 관리 |
 | 설정 저장 | `SharedPreferences` (동기 API, 메인 스레드를 막을 수 있음, Android 전용) | — | **DataStore** |
 | 네트워크 | — | Retrofit + OkHttp (실무 표준, JVM 전용) | **Ktor Client** (+ Retrofit 같은 선언 방식이 필요하면 Ktorfit) |
@@ -122,7 +122,7 @@
 - **의존성은 안쪽(비즈니스 규칙)으로만 향한다.** 클린 아키텍처의 핵심 규칙 하나.
   `androidApp → shared → domain`, `shared → data → domain`. `domain`은 아무것도 모릅니다.
 - **의존성 역전**: `domain`이 `PeriodRepository` **인터페이스**를 정하고, `data`가 `PeriodRepositoryImpl`로 **구현**합니다. 그래서 `domain`은 Room을 몰라도 됩니다.
-- **`internal`로 구현 숨기기**: `PeriodRepositoryImpl`, `PeriodDao`, `DalfamDatabase`는 전부 `internal`입니다. `data` 밖에서는 Koin 모듈(`dataModule`)과 인터페이스로만 씁니다.
+- **`internal`로 구현 숨기기**: `PeriodRepositoryImpl`, `PeriodDao`, `DalfamDatabase`는 전부 `internal`입니다. `data` 밖에서는 Koin 모듈(`DataModule`)과 인터페이스로만 씁니다.
 - **패키지는 의존을 막지 못한다.** Kotlin에는 package-private이 없습니다. 패키지는 찾기 쉽게 하는 용도이고, 의존을 막는 건 모듈의 몫입니다.
 - **계층마다 자기 모델을 쓴다**: `PeriodEntity`(data, Room) ↔ `Period`(domain) ↔ `HomeUiState`(shared). 변환 함수(`toDomain()`, `toEntity()`)는 바깥 계층인 `data`에 둡니다.
 
@@ -152,6 +152,8 @@
 
 ### Koin (DSL)
 
+> 달팸은 2026-11-23에 [Koin Annotations](#koin-annotations-compiler-plugin)로 바꿨습니다. 이 섹션은 비교용으로 남겨 둡니다.
+
 | 키워드 | 의미 | 달팸에서 |
 |---|---|---|
 | `single { }` | 앱 전체에 하나 | DB, DAO, Repository, Dispatcher, `DateProvider` |
@@ -164,11 +166,46 @@
 - **생성자 기본값은 Koin이 쓰지 않는다**: 필요한 것은 전부 `get()`으로 넘깁니다.
 - **`domain`은 Koin을 모른다**: `domain` 등록(`domainModule`)은 `shared`에서 합니다. `domain`을 순수 Kotlin으로 두기 위해서입니다.
 - **시작은 한 번만**: Android는 `Application.onCreate()`(`DalfamApp`)에서 `initKoin { androidContext(...) }`를 부릅니다.
-- **모듈 검증 테스트**: `appModules` 목록을 테스트에서도 그대로 써서 등록이 빠진 게 없는지 확인합니다(`AppModulesTest`).
+- **모듈 검증 테스트**: `appModules` 목록을 테스트에서도 그대로 써서 등록이 빠진 게 없는지 확인했습니다(`AppModulesTest`). DSL은 등록 누락을 **실행해 봐야** 알 수 있어서 이 테스트가 꼭 필요했습니다.
+
+### Koin Annotations (Compiler Plugin)
+
+DSL로 짜던 등록을 어노테이션으로 바꿨습니다(ADR 0008). 예전 KSP 방식(`koin-ksp-compiler`)은 지원이 끝나서, Kotlin 컴파일러 플러그인(`io.insert-koin.compiler.plugin`)을 씁니다.
+
+**DSL → 어노테이션 → Hilt 비교**
+
+| 하고 싶은 것 | Koin DSL (전) | Koin Annotations (지금) | Hilt |
+|---|---|---|---|
+| 내 클래스 등록 | `single { PeriodRepositoryImpl(get(), get(IoDispatcher)) }` | 클래스에 `@Singleton` | 생성자에 `@Inject` |
+| 인터페이스로 찾게 하기 | `single<PeriodRepository> { ... }` | `@Singleton(binds = [PeriodRepository::class])` | `@Binds` |
+| 남의 타입(Dispatcher, Room DB) 등록 | `single { Dispatchers.IO }` | `@Module` 클래스 안의 `@Singleton fun` | `@Provides` |
+| 매번 새로 | `factory { }` | `@Factory` | 범위 어노테이션 없음 |
+| ViewModel | `viewModel { HomeViewModel(get(), get(), get()) }` | 클래스에 `@KoinViewModel` | `@HiltViewModel` |
+| 같은 타입 구분 | `named("io")` (문자열) | `@IoDispatcher` (직접 만든 `@Qualifier` 어노테이션) | `@Qualifier` |
+| 모듈 묶기 | `listOf(dataModule, domainModule, ...)` | `@Module(includes = [...])` | `@Module` + `@InstallIn` |
+| 알아서 포함되는 모듈 | 없음 | `@Configuration` | `@InstallIn(SingletonComponent::class)` |
+| 시작 | `startKoin { modules(appModules) }` | `@KoinApplication object DalfamKoinApp` + `startKoin<DalfamKoinApp>()` | `@HiltAndroidApp` |
+| 등록 누락 발견 | **실행해야** 앎 (크래시) | **빌드할 때** 앎 | 빌드할 때 앎 |
+
+- **가장 큰 차이: 컴파일 시점 검사(compile safety).** 플러그인은 `startKoin<DalfamKoinApp>()`부터 그래프를 따라가며 필요한 게 다 있는지 빌드할 때 확인합니다. `HomeViewModel`의 `@KoinViewModel`을 일부러 지웠더니 빌드가 실패하면서 `koinViewModel()`을 부르는 `HomeScreen.kt` 줄을 짚었습니다. DSL이었다면 앱을 켜고 그 화면에 들어가서야 크래시로 알았을 겁니다.
+- **`@ComponentScan("패키지")`**: 그 패키지와 하위 패키지에서 `@Singleton`·`@Factory`·`@KoinViewModel`이 붙은 **클래스**를 찾아 등록합니다. 화면이 늘어나도 `PresentationModule`을 고칠 필요가 없습니다.
+- **`domain`은 여전히 Koin을 모른다**: UseCase 클래스에 어노테이션을 붙이면 `domain`이 Koin에 의존하게 됩니다. 그래서 `shared`의 `DomainModule`에 `@Factory fun`으로 적습니다. Hilt에서 남의 클래스를 `@Provides`로 등록하는 것과 같은 모양입니다.
+- **함수 파라미터가 곧 `get()`**: `fun database(builder: ..., @IoDispatcher dispatcher: CoroutineDispatcher)`처럼 쓰면 Koin이 타입과 이름표로 찾아 넣습니다. DSL의 "정확한 타입을 `get<…>()`에 적어야 한다" 문제가 사라집니다.
+- **`internal` 타입은 `internal fun`으로**: `DalfamDatabase`처럼 `internal`인 타입을 돌려주는 함수는 공개 함수가 될 수 없습니다. 플러그인이 만드는 등록 코드는 같은 Gradle 모듈 안에 생기므로 `internal fun`이어도 됩니다. 다른 Gradle 모듈(`shared`)에서도 그래프 검사는 이 정의를 잘 읽습니다.
+- **Android `Context`**: 파라미터에 `context: Context`라고만 쓰면 됩니다. 시작할 때 `androidContext(...)`로 넘긴 것이 들어옵니다.
+- **테스트도 시작점을 만든다**: 테스트용 `@KoinApplication`(`DataTestApp`, `AppModulesTestApp`)을 만들고 `koinApplication<DataTestApp>()`으로 꺼냅니다. 그러면 테스트 코드의 `koin.get<…>()`도 빌드할 때 검사됩니다. 가짜(메모리 DB, 메모리 저장소)는 테스트용 `@Module`로 넣습니다.
+- **플러그인 로그 보기**: `build.gradle.kts`에 `koinCompiler { userLogs = true }`를 넣으면 플러그인이 찾은 정의 목록이 빌드 로그에 나옵니다. 처음 붙일 때 확인용으로 켰다가 끕니다.
+
+**겪은 함정 (Koin Compiler Plugin 1.2.1, Kotlin 2.4.21, 2026-11-23)**
+
+1. **expect/actual 모듈 클래스를 `includes`에 넣으면 안쪽 정의를 못 본다.** 공통 코드의 `@Module expect class PlatformModule`을 `includes`에 넣었더니, `actual` 쪽에 적은 DB 빌더를 "없다"고 했습니다. 플러그인은 정의가 하나도 없는 `expect` 쪽을 읽습니다. 그래서 플랫폼 모듈(`DataPlatformModule`)에 `@Configuration`을 붙였습니다. `@KoinApplication`이 클래스패스에서 알아서 찾아 넣으니 공통 코드에서 이름을 부를 필요가 없습니다.
+2. **iOS 테스트 컴파일에서만 `@ComponentScan`으로 찾은 클래스를 못 본다.** `internal`이든 `public`이든 마찬가지였고, Android·jvm 테스트와 iOS **메인** 컴파일은 정상이었습니다. 앱 코드는 문제가 없으니 클래스 어노테이션은 그대로 두었습니다. Koin 조립 테스트 2개만 iOS에서 빠지도록 옮겼습니다(`DataModuleTest` → `data/src/jvmTest`, `AppModulesTest` → `shared/src/androidHostTest`). 플러그인이 고쳐지면 `commonTest`로 되돌립니다. 이 문제는 Windows 탓이 아니라 컴파일러 플러그인 문제라서, Mac에서도 똑같이 일어납니다.
+3. **Kotlin 버전 경고**: Kotlin 2.4.21은 플러그인이 검증한 버전(2.4.20까지)보다 새로워서 빌드마다 경고가 뜹니다. 빌드는 됩니다. Kotlin을 올릴 때는 플러그인 지원 버전을 먼저 확인합니다.
 
 ### KMP
 
-- **`expect` / `actual`**: 공통 코드에 "이런 게 있다"(`expect`)고 선언하고, 플랫폼별로 실제 구현(`actual`)을 둡니다. 예: `platformModule`, DB 빌더.
+- **`expect` / `actual`**: 공통 코드에 "이런 게 있다"(`expect`)고 선언하고, 플랫폼별로 실제 구현(`actual`)을 둡니다. 예: DB 빌더(`dalfamDatabaseBuilder`). Koin 모듈은 expect/actual 대신 `@Configuration`을 씁니다([함정 1](#koin-annotations-compiler-plugin)).
+- **플랫폼마다, 메인/테스트마다 따로 컴파일된다**: 같은 코드라도 Android 메인, Android 테스트, iOS 메인, iOS 테스트가 각각 컴파일됩니다. 한 곳만 깨질 수 있습니다. Windows에서도 iOS 코드 **컴파일**은 되므로(`allTests`가 iOS 테스트까지 컴파일함) 문제를 미리 잡을 수 있습니다. 링크와 실행은 Mac이 있어야 합니다.
 - `DalfamDatabaseConstructor`처럼 **라이브러리 컴파일러가 `actual`을 생성**해 주는 경우도 있습니다(Room).
 - **`commonMain`에서 `java.*` 금지**: iOS에서는 JVM이 없습니다. 그래서 `java.time` 대신 kotlinx-datetime을 씁니다.
 
@@ -205,7 +242,7 @@
 | 항목 | ADR | 지금 코드 | 메모 |
 |---|---|---|---|
 | ViewModel 이벤트 받기 | `sealed interface XxxAction` + `onAction(action)` 하나 (0007) | `onStartClick()`, `onEndClick()`, `onMessageShown()` 함수 여러 개 | 버튼이 적을 땐 함수가 더 단순함. 화면이 커지면 `Action`으로 바꿀지 판단 |
-| DI | Koin + **Compiler Plugin** (0008) | Koin **DSL**(`module { single { } }`) | 계획대로 DSL을 먼저 익히고, 다음 단계에서 Annotations로 바꿔 Hilt와 비교 |
+| DI | Koin + **Compiler Plugin** (0008) | ✅ 일치 (2026-11-23 DSL → Annotations 전환) | DSL을 먼저 익힌 뒤 바꿨음. 플러그인 버그로 Koin 조립 테스트 2개는 `commonTest` 밖에 있음 |
 
 ---
 
@@ -216,6 +253,8 @@
 | 날짜 | 질문 | 답이 있는 곳 |
 |---|---|---|
 | 2026-11-07 | ADR 0006의 "ADR"이 뭐야? | [프로젝트 운영](#프로젝트-운영) |
+| 2026-11-23 | iOS 테스트만 컴파일이 안 되는 건 무슨 상황이야? 클래스 어노테이션과 함수 등록 중 뭘 골라? | [Koin Annotations](#koin-annotations-compiler-plugin) |
+| 2026-11-23 | 나중에 Mac에서 하면 괜찮은 거야? | [Koin Annotations](#koin-annotations-compiler-plugin), [KMP](#kmp) |
 
 <!-- 새 질문은 표 맨 아래에 한 줄 추가: | YYYY-MM-DD | 질문 한 줄 | [섹션 이름](#앵커) | -->
 
@@ -224,10 +263,9 @@
 
 ## 5. 다음에 비교해 볼 것
 
-학습 순서: Koin DSL ✅ → ViewModel·상태 ✅ → 다국어 ✅ → **Koin Annotations** → Navigation 3 → DataStore
+학습 순서: Koin DSL ✅ → ViewModel·상태 ✅ → 다국어 ✅ → Koin Annotations ✅ → **Navigation 3** → DataStore
 
 | 다음 단계 | 무엇과 비교하나 |
 |---|---|
-| Koin Annotations | 지금의 Koin DSL, 그리고 실무 표준인 Hilt(`@Inject`, `@Module`) |
 | Navigation 3 | Fragment + Navigation XML, Navigation Compose 2.x |
 | DataStore | `SharedPreferences` |

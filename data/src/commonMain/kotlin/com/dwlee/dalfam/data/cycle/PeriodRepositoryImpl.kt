@@ -1,5 +1,6 @@
 package com.dwlee.dalfam.data.cycle
 
+import com.dwlee.dalfam.data.di.IoDispatcher
 import com.dwlee.dalfam.domain.cycle.model.Period
 import com.dwlee.dalfam.domain.cycle.PeriodRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -7,15 +8,22 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Singleton
 
 /**
  * Room 기반 [PeriodRepository]. 호출하는 쪽은 스레드를 신경 쓰지 않아도 된다(main-safe, ADR 0007).
  *
+ * `@Singleton(binds = ...)`: 이 클래스를 하나만 만들고, [PeriodRepository] 타입으로 찾을 때 이걸 준다.
+ * Hilt로 치면 생성자의 `@Inject` + `@Binds`를 한 줄로 쓴 것이다.
+ * (binds를 비우면 모든 상위 타입으로 등록되지만, 의도를 드러내려고 적어 둔다.)
+ * `DataModule`의 `@ComponentScan`이 이 클래스를 찾아 등록한다.
+ *
  * @param ioDispatcher DB 작업을 돌릴 Dispatcher. 테스트에서 바꿀 수 있도록 주입받는다.
  */
+@Singleton(binds = [PeriodRepository::class])
 internal class PeriodRepositoryImpl(
     private val dao: PeriodDao,
-    private val ioDispatcher: CoroutineDispatcher,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PeriodRepository {
 
     override fun observePeriods(): Flow<List<Period>> =

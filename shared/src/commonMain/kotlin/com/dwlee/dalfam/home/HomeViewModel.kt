@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.annotation.KoinViewModel
 
 /**
  * 홈 화면의 상태를 들고 있고, 버튼 이벤트를 UseCase로 넘긴다.
@@ -24,7 +25,11 @@ import kotlinx.coroutines.launch
  *   +------------------(uiState: StateFlow)-------------------+
  * ```
  * 화면은 상태를 직접 바꾸지 않는다. 이벤트만 보내고, 바뀐 상태를 받아서 다시 그린다.
+ *
+ * `@KoinViewModel`: Koin에 ViewModel로 등록한다. 화면에서는 지금처럼 `koinViewModel()`로 꺼낸다.
+ * Hilt의 `@HiltViewModel` + `@Inject constructor`에 해당한다.
  */
+@KoinViewModel
 class HomeViewModel(
     observeCycleStatus: ObserveCycleStatusUseCase,
     private val recordPeriodStart: RecordPeriodStartUseCase,

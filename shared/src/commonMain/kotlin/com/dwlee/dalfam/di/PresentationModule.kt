@@ -1,21 +1,15 @@
 package com.dwlee.dalfam.di
 
-import com.dwlee.dalfam.home.HomeViewModel
-import org.koin.core.module.dsl.viewModel
-import org.koin.dsl.module
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
 
 /**
  * 화면(ViewModel) 등록.
  *
- * `viewModel { }`은 `factory`와 비슷하지만, 화면 생명주기에 맞춰 보관된다.
- * 화면 회전에도 같은 인스턴스가 유지되고, 화면이 완전히 닫히면 버려진다.
+ * ViewModel 클래스에는 `@KoinViewModel`을 직접 붙이고(예: `HomeViewModel`),
+ * 여기서는 그 패키지를 훑기만 한다. 화면이 늘어나도 이 파일은 고칠 필요가 없다.
+ * (DSL에서는 화면마다 `viewModel { ... }` 줄을 추가해야 했다.)
  */
-val presentationModule = module {
-    viewModel {
-        HomeViewModel(
-            observeCycleStatus = get(),
-            recordPeriodStart = get(),
-            recordPeriodEnd = get(),
-        )
-    }
-}
+@Module
+@ComponentScan("com.dwlee.dalfam.home")
+class PresentationModule
