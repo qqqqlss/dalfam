@@ -52,9 +52,14 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.koin.core)
+            // Compose에서 koinViewModel()로 ViewModel을 꺼내고, 모듈에서 viewModel { }로 등록하기 위해
+            implementation(libs.koin.compose.viewmodel)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
         }
         getByName("androidDeviceTest").dependencies {
             implementation(libs.androidx.testRunner)

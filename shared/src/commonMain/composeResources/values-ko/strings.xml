@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    한국어. 기기 언어가 한국어일 때 쓰인다.
+    키는 values/strings.xml과 똑같이 맞춘다 (StringResourcesTest가 검사한다).
+    한국어는 단수/복수 구분이 없어서 plurals도 other 하나만 둔다.
+-->
+<resources>
+    <!-- 홈 -->
+    <string name="home_empty">아직 기록이 없어요.\n생리가 시작되면 아래 버튼을 눌러 주세요.</string>
+    <string name="home_button_start">시작했어요</string>
+    <string name="home_button_end">끝났어요</string>
+    <string name="home_cycle_day">주기 %1$d일차</string>
+    <plurals name="home_days_until_next_period">
+        <item quantity="other">다음 생리까지 %1$d일</item>
+    </plurals>
+    <plurals name="home_days_late">
+        <item quantity="other">예정일보다 %1$d일 늦어지고 있어요</item>
+    </plurals>
+
+    <!-- 주기 단계 -->
+    <string name="phase_menstrual">생리 중</string>
+    <string name="phase_follicular">난포기</string>
+    <string name="phase_ovulation">배란기</string>
+    <string name="phase_luteal">황체기</string>
+
+    <!-- 홈 안내 (스낵바) -->
+    <string name="message_period_started">시작을 기록했어요</string>
+    <string name="message_period_ended">종료를 기록했어요</string>
+    <string name="message_already_ongoing">이미 진행 중인 기록이 있어요</string>
+    <string name="message_no_ongoing_period">진행 중인 생리가 없어요</string>
+    <string name="message_overlaps">다른 기록과 기간이 겹쳐요</string>
+    <string name="message_future_date">미래 날짜는 기록할 수 없어요</string>
+    <string name="message_before_start">종료일이 시작일보다 빨라요</string>
+</resources>

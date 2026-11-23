@@ -31,6 +31,11 @@ kotlin {
             implementation(project(":domain"))
             implementation(libs.room3.runtime)
             implementation(libs.sqlite.bundled)
+            implementation(libs.koin.core)
+        }
+        androidMain.dependencies {
+            // androidContext()로 Application Context를 꺼내 쓰기 위해
+            implementation(libs.koin.android)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
