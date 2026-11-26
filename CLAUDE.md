@@ -60,8 +60,11 @@
 
 ```bash
 ./gradlew :androidApp:assembleDebug        # Android 디버그 빌드
-./gradlew :shared:testAndroidHostTest      # 공통 로직 테스트(JVM 호스트)
+./gradlew :domain:jvmTest :data:jvmTest    # 도메인·DB 테스트(JVM)
+./gradlew :shared:testAndroidHostTest      # shared 테스트(JVM 호스트)
 ```
+
+CI(`.github/workflows/ci.yml`)는 위 명령에 더해 macOS에서 iOS 시뮬레이터 테스트와 `Shared` 프레임워크 빌드를 돌린다. iOS 코드는 로컬에서 확인할 수 없으므로 CI 결과로 확인한다.
 
 ## 브랜치 (Git Flow — ADR 0005)
 - 기본 브랜치는 `develop`. 작업은 `develop`에서 `feature/짧은-설명`(버그는 `bugfix/`)을 만들어 한다.
