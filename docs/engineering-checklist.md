@@ -42,7 +42,7 @@
 | [ ] 테스트 작성 기준 | 무엇을 꼭 테스트할지 (예: 주기 계산·예정일 로직은 필수) | `CLAUDE.md` |
 | [ ] 코드 스타일 검사 | ktlint 또는 detekt 포맷 규칙 | Gradle 플러그인 |
 | [ ] `commonMain`의 `java.*` 금지 강제 | detekt 금지 import 규칙 | detekt 설정 |
-| [ ] CI | GitHub Actions: Android 빌드 + `:shared:testAndroidHostTest` | `.github/workflows/` |
+| [x] CI | GitHub Actions: Android 빌드·테스트(Ubuntu), iOS 시뮬레이터 테스트·프레임워크 빌드(macOS) | `.github/workflows/` |
 | [ ] PR 필수·검사 통과 | `main`·`develop` Ruleset에 Require a pull request, Require status checks 추가 | Ruleset |
 | [ ] 비밀값 검사 | gitleaks (pre-commit 또는 CI) | 설정 파일 |
 | [ ] UI 기능 모듈 분리 | 화면이 많아지면 `shared`의 UI를 `feature/*` 모듈로 분리 (`domain`·`data`는 공용 유지) | ADR 0006 후속 |
