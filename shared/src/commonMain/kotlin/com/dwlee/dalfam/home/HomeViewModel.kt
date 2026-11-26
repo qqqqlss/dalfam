@@ -16,15 +16,15 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 
 /**
- * 홈 화면의 상태를 들고 있고, 버튼 이벤트를 UseCase로 넘긴다.
+ * 홈 화면의 상태를 들고 있고, 사용자 행동을 UseCase로 넘긴다.
  *
  * 단방향 데이터 흐름(UDF):
  * ```
- * 화면 --(onStartClick 같은 이벤트)--> ViewModel --> UseCase --> DB
+ * 화면 --(onAction(HomeAction))--> ViewModel --> UseCase --> DB
  *   ^                                                         |
  *   +------------------(uiState: StateFlow)-------------------+
  * ```
- * 화면은 상태를 직접 바꾸지 않는다. 이벤트만 보내고, 바뀐 상태를 받아서 다시 그린다.
+ * 화면은 상태를 직접 바꾸지 않는다. 행동([HomeAction])만 보내고, 바뀐 상태를 받아서 다시 그린다.
  *
  * `@KoinViewModel`: Koin에 ViewModel로 등록한다. 화면에서는 지금처럼 `koinViewModel()`로 꺼낸다.
  * Hilt의 `@HiltViewModel` + `@Inject constructor`에 해당한다.
@@ -55,7 +55,21 @@ class HomeViewModel(
             initialValue = HomeUiState(),
         )
 
-    fun onStartClick() {
+    /**
+     * 화면의 모든 행동이 들어오는 입구. 공개 함수는 이것 하나다(ADR 0007).
+     *
+     * `when`이 `sealed interface`를 다 다루는지 컴파일러가 검사하므로,
+     * [HomeAction]에 행동을 추가하고 여기서 처리하지 않으면 빌드가 실패한다.
+     */
+    fun onAction(action: HomeAction) {
+        when (action) {
+            HomeAction.StartPeriod -> startPeriod()
+            HomeAction.EndPeriod -> endPeriod()
+            HomeAction.MessageShown -> message.value = null
+        }
+    }
+
+    private fun startPeriod() {
         // viewModelScope: 화면이 완전히 사라지면(ViewModel이 버려지면) 자동으로 취소된다.
         viewModelScope.launch {
             message.value = when (recordPeriodStart()) {
@@ -67,7 +81,7 @@ class HomeViewModel(
         }
     }
 
-    fun onEndClick() {
+    private fun endPeriod() {
         viewModelScope.launch {
             message.value = when (recordPeriodEnd()) {
                 RecordPeriodEndResult.Success -> HomeMessage.PERIOD_ENDED
@@ -76,10 +90,5 @@ class HomeViewModel(
                 RecordPeriodEndResult.BeforeStart -> HomeMessage.BEFORE_START
             }
         }
-    }
-
-    /** 스낵바를 보여 준 뒤 호출. 지우지 않으면 화면 회전 때 같은 안내가 또 뜬다. */
-    fun onMessageShown() {
-        message.value = null
     }
 }

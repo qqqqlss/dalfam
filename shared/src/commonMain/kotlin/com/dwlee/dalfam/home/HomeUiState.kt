@@ -10,7 +10,7 @@ import com.dwlee.dalfam.domain.cycle.model.CycleStatus
  *
  * @property isLoading DB에서 첫 값을 받기 전.
  * @property status 오늘의 상태. 기록이 하나도 없으면 null.
- * @property message 한 번만 보여 줄 안내(스낵바). 보여 준 뒤 [HomeViewModel.onMessageShown]으로 지운다.
+ * @property message 한 번만 보여 줄 안내(스낵바). 보여 준 뒤 [HomeAction.MessageShown]으로 지운다.
  */
 data class HomeUiState(
     val isLoading: Boolean = true,

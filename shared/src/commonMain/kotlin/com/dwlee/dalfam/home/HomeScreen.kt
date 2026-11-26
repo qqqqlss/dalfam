@@ -64,22 +64,20 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 
     HomeContent(
         state = state,
-        onStartClick = viewModel::onStartClick,
-        onEndClick = viewModel::onEndClick,
-        onMessageShown = viewModel::onMessageShown,
+        onAction = viewModel::onAction,
     )
 }
 
 /**
  * 상태를 받아 그리기만 하는 화면. ViewModel을 모르기 때문에 미리보기·테스트가 쉽다.
- * (stateless composable: 상태는 위에서 내려받고, 이벤트는 람다로 위에 올린다)
+ * (stateless composable: 상태는 위에서 내려받고, 행동은 [onAction] 람다 하나로 위에 올린다)
+ *
+ * 버튼이 늘어도 파라미터는 `onAction` 하나 그대로다. 행동 종류는 [HomeAction]에만 추가한다.
  */
 @Composable
 fun HomeContent(
     state: HomeUiState,
-    onStartClick: () -> Unit,
-    onEndClick: () -> Unit,
-    onMessageShown: () -> Unit,
+    onAction: (HomeAction) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -88,7 +86,7 @@ fun HomeContent(
     LaunchedEffect(state.message) {
         val message = state.message ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(getString(message.textRes()))
-        onMessageShown()
+        onAction(HomeAction.MessageShown)
     }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
@@ -105,10 +103,10 @@ fun HomeContent(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = onStartClick, modifier = Modifier.weight(1f)) {
+                Button(onClick = { onAction(HomeAction.StartPeriod) }, modifier = Modifier.weight(1f)) {
                     Text(stringResource(Res.string.home_button_start))
                 }
-                OutlinedButton(onClick = onEndClick, modifier = Modifier.weight(1f)) {
+                OutlinedButton(onClick = { onAction(HomeAction.EndPeriod) }, modifier = Modifier.weight(1f)) {
                     Text(stringResource(Res.string.home_button_end))
                 }
             }
@@ -165,9 +163,7 @@ private fun HomeContentEmptyPreview() {
     MaterialTheme {
         HomeContent(
             state = HomeUiState(isLoading = false),
-            onStartClick = {},
-            onEndClick = {},
-            onMessageShown = {},
+            onAction = {},
         )
     }
 }

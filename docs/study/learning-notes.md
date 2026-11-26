@@ -136,17 +136,25 @@
 ### UDF와 ViewModel
 
 ```
-화면 --(onStartClick 같은 이벤트)--> ViewModel --> UseCase --> DB
+화면 --(onAction(HomeAction))--> ViewModel --> UseCase --> DB
   ^                                                         |
   +------------------(uiState: StateFlow)-------------------+
 ```
 
 - 데이터는 위에서 아래로, 이벤트는 아래에서 위로만 흐릅니다. 화면은 상태를 직접 바꾸지 않습니다.
+- **행동은 `sealed interface HomeAction` + `onAction()` 하나로 받는다** (ADR 0007): ViewModel의 공개 함수는 `onAction` 하나, `HomeContent`의 람다도 `onAction` 하나입니다. 버튼이 늘어도 `HomeAction`에 한 줄 추가하면 되고, `when`에서 빠뜨리면 컴파일 에러가 납니다.
+
+  | | 함수 여러 개 (`onStartClick()` …) | `sealed Action` + `onAction()` |
+  |---|---|---|
+  | 장점 | 단순. 행동이 2~3개면 코드가 짧음. Google 공식 샘플에 흔함 | 화면의 행동 목록이 타입 하나에 모임. 로깅·테스트·리듀서로 넓히기 쉬움. MVI 계열 팀에서 흔함 |
+  | 단점 | 화면이 커지면 공개 함수와 Composable 람다 파라미터가 계속 늘어남 | 행동이 적을 때는 장황함 |
+
+  처음엔 함수 여러 개로 짰다가, 규칙(ADR)과 코드가 갈리는 걸 막기 위해 `onAction`으로 맞췄습니다(2026-11-26). "커지면 그때 바꾸자"는 실제로는 커진 뒤에 바꾸기가 더 어렵습니다.
 - **`MutableStateFlow`는 안에, `StateFlow`는 밖에**: 바꾸는 건 ViewModel 안에서만 합니다.
 - **`stateIn(viewModelScope, WhileSubscribed(5_000), 초기값)`**: 차가운 Flow를 "항상 최신 값 하나를 들고 있는" StateFlow로 바꿉니다. 화면이 안 보이면 5초 뒤 DB 구독을 멈춥니다. 화면 회전처럼 잠깐 끊길 때 다시 구독하지 않으려고 5초 여유를 둡니다.
 - **`combine`**: DB 기록 Flow와 안내 메시지 Flow를 합쳐 `HomeUiState` 하나로 만듭니다.
 - **UiState는 불변(`data class` + `val`)**: 바뀔 때는 새 객체를 만듭니다. 그래서 Compose가 "이전 값과 다르다"를 쉽게 알아챕니다.
-- **일회성 이벤트(스낵바)도 상태로**: `message`를 상태에 두고, 보여 준 뒤 `onMessageShown()`으로 지웁니다. 안 지우면 화면 회전 때 같은 안내가 또 뜹니다.
+- **일회성 이벤트(스낵바)도 상태로**: `message`를 상태에 두고, 보여 준 뒤 `HomeAction.MessageShown`으로 지웁니다. 안 지우면 화면 회전 때 같은 안내가 또 뜹니다.
 - **ViewModel은 문자열을 모른다**: `HomeMessage` enum만 넘기고, 실제 문구(한국어/영어)는 화면이 string resource에서 고릅니다. 다국어 처리가 쉬워지고 ViewModel 테스트도 문구와 무관해집니다.
 - **`collectAsStateWithLifecycle()`**: 화면이 안 보일 때 수집을 멈춥니다.
 
@@ -241,7 +249,7 @@ DSL로 짜던 등록을 어노테이션으로 바꿨습니다(ADR 0008). 예전 
 
 | 항목 | ADR | 지금 코드 | 메모 |
 |---|---|---|---|
-| ViewModel 이벤트 받기 | `sealed interface XxxAction` + `onAction(action)` 하나 (0007) | `onStartClick()`, `onEndClick()`, `onMessageShown()` 함수 여러 개 | 버튼이 적을 땐 함수가 더 단순함. 화면이 커지면 `Action`으로 바꿀지 판단 |
+| ViewModel 이벤트 받기 | `sealed interface XxxAction` + `onAction(action)` 하나 (0007) | ✅ 일치 (2026-11-26 함수 여러 개 → `HomeAction` + `onAction()`) | 처음엔 버튼이 적어 함수로 짰으나, 규칙과 코드가 갈리지 않게 ADR 쪽으로 맞춤. 비교는 [UDF와 ViewModel](#udf와-viewmodel) |
 | DI | Koin + **Compiler Plugin** (0008) | ✅ 일치 (2026-11-23 DSL → Annotations 전환) | DSL을 먼저 익힌 뒤 바꿨음. 플러그인 버그로 Koin 조립 테스트 2개는 `commonTest` 밖에 있음 |
 
 ---
@@ -255,6 +263,7 @@ DSL로 짜던 등록을 어노테이션으로 바꿨습니다(ADR 0008). 예전 
 | 2026-11-07 | ADR 0006의 "ADR"이 뭐야? | [프로젝트 운영](#프로젝트-운영) |
 | 2026-11-23 | iOS 테스트만 컴파일이 안 되는 건 무슨 상황이야? 클래스 어노테이션과 함수 등록 중 뭘 골라? | [Koin Annotations](#koin-annotations-compiler-plugin) |
 | 2026-11-23 | 나중에 Mac에서 하면 괜찮은 거야? | [Koin Annotations](#koin-annotations-compiler-plugin), [KMP](#kmp) |
+| 2026-11-26 | ViewModel 이벤트를 함수 여러 개로 받은 이유가 있어? ADR대로 `onAction`으로 맞추는 게 맞아? | [UDF와 ViewModel](#udf와-viewmodel) |
 
 <!-- 새 질문은 표 맨 아래에 한 줄 추가: | YYYY-MM-DD | 질문 한 줄 | [섹션 이름](#앵커) | -->
 

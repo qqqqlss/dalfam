@@ -69,7 +69,7 @@ class HomeViewModelTest {
         viewModel.uiState.test {
             awaitUntil { !it.isLoading }
 
-            viewModel.onStartClick()
+            viewModel.onAction(HomeAction.StartPeriod)
 
             val state = awaitUntil { it.status != null && it.message != null }
             assertEquals(1, state.status?.cycleDay)
@@ -82,10 +82,10 @@ class HomeViewModelTest {
     fun 안내를_보여준_뒤에는_지워진다() = runTest {
         val viewModel = createViewModel()
         viewModel.uiState.test {
-            viewModel.onStartClick()
+            viewModel.onAction(HomeAction.StartPeriod)
             awaitUntil { it.message != null }
 
-            viewModel.onMessageShown()
+            viewModel.onAction(HomeAction.MessageShown)
 
             awaitUntil { it.message == null }
         }
@@ -97,7 +97,7 @@ class HomeViewModelTest {
         viewModel.uiState.test {
             awaitUntil { !it.isLoading }
 
-            viewModel.onEndClick()
+            viewModel.onAction(HomeAction.EndPeriod)
 
             val state = awaitUntil { it.message != null }
             assertEquals(HomeMessage.NO_ONGOING_PERIOD, state.message)
