@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Default (English). Used when the device language has no matching values-xx folder.
+    When you add a key here, add the same key to values-ko/strings.xml too
+    (StringResourcesTest checks that both files have the same keys).
+-->
+<resources>
+    <!-- Home -->
+    <string name="home_empty">No records yet.\nTap the button below when your period starts.</string>
+    <string name="home_button_start">Period started</string>
+    <string name="home_button_end">Period ended</string>
+    <string name="home_cycle_day">Cycle day %1$d</string>
+    <plurals name="home_days_until_next_period">
+        <item quantity="one">%1$d day until your next period</item>
+        <item quantity="other">%1$d days until your next period</item>
+    </plurals>
+    <plurals name="home_days_late">
+        <item quantity="one">%1$d day later than expected</item>
+        <item quantity="other">%1$d days later than expected</item>
+    </plurals>
+
+    <!-- Cycle phase -->
+    <string name="phase_menstrual">On period</string>
+    <string name="phase_follicular">Follicular phase</string>
+    <string name="phase_ovulation">Ovulation</string>
+    <string name="phase_luteal">Luteal phase</string>
+
+    <!-- Home messages (snackbar) -->
+    <string name="message_period_started">Period start saved</string>
+    <string name="message_period_ended">Period end saved</string>
+    <string name="message_already_ongoing">A period is already in progress</string>
+    <string name="message_no_ongoing_period">No period in progress</string>
+    <string name="message_overlaps">This overlaps another record</string>
+    <string name="message_future_date">You cannot record a future date</string>
+    <string name="message_before_start">The end date is before the start date</string>
+</resources>
